@@ -30,6 +30,12 @@ public static class MonadIOExtensions
     public static K<M, C> SelectMany<M, A, B, C>(this K<M, A> ma, Func<A, IO<B>> bind, Func<A, B, C> project) 
         where M : MonadIO<M> =>
         ma.Bind(x => IOTail<A>.resolve(x, bind(x), project));
+    
+    /// <summary>
+    /// Monad bind operation
+    /// </summary>
+    public static K<M, C> SelectMany<M, A, B, C>(this K<M, A> ma, Func<A, K<IO, B>> bind, Func<A, B, C> project) 
+        where M : MonadIO<M> => SelectMany(ma, a => bind(a).As(), project);
 
     /// <summary>
     /// Monad bind operation

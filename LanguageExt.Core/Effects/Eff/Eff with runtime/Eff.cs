@@ -329,6 +329,17 @@ public record Eff<RT, A>(ReaderT<RT, IO, A> effect) :
     [Pure, MethodImpl(Opt.Default)]
     public Eff<RT, B> Bind<B>(Func<A, IO<B>> f) =>
         new(effect.Bind(f));
+    
+    /// <summary>
+    /// Monadic bind operation.  This runs the current `Eff` monad and feeds its result to the
+    /// function provided; which in turn returns a new `Eff` monad.  This can be thought of as
+    /// chaining IO operations sequentially.
+    /// </summary>
+    /// <param name="f">Bind operation</param>
+    /// <returns>Composition of this monad and the result of the function provided</returns>
+    [Pure, MethodImpl(Opt.Default)]
+    public Eff<RT, B> Bind<B>(Func<A, K<IO, B>> f) =>
+        Bind(a => f(a).As());
 
     /// <summary>
     /// Monadic bind operation.  This runs the current `Eff` monad and feeds its result to the
@@ -444,6 +455,17 @@ public record Eff<RT, A>(ReaderT<RT, IO, A> effect) :
     [Pure, MethodImpl(Opt.Default)]
     public Eff<RT, C> SelectMany<B, C>(Func<A, IO<B>> bind, Func<A, B, C> project) =>
         new(effect.SelectMany(bind, project));
+    
+    /// <summary>
+    /// Monadic bind operation.  This runs the current `Eff` monad and feeds its result to the
+    /// function provided; which in turn returns a new `Eff` monad.  This can be thought of as
+    /// chaining IO operations sequentially.
+    /// </summary>
+    /// <param name="bind">Bind operation</param>
+    /// <returns>Composition of this monad and the result of the function provided</returns>
+    [Pure, MethodImpl(Opt.Default)]
+    public Eff<RT, C> SelectMany<B, C>(Func<A, K<IO, B>> bind, Func<A, B, C> project) =>
+        SelectMany(a => bind(a).As(), project);
 
     /// <summary>
     /// Monadic bind operation.  This runs the current `Eff` monad and feeds its result to the
